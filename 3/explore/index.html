@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CattyMod - Explore</title>
+
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB8AAAAgCAYAAADqgqNBAA...">
+
+<style>
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background-image: url("https://trampoline.turbowarp.org/avatars/20269294");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+</style>
+</head>
+
+<body>
+
+<iframe id="explore-frame" src="https://cattymod-explore.lovable.app"></iframe>
+
+<script>
+const iframe = document.getElementById("explore-frame");
+const EXPLORER_ORIGIN = "https://cattymod-explore.lovable.app";
+
+let receivedConnection = false;
+let failed = false;
+
+function isMobile() {
+  return (
+    window.matchMedia("(max-width: 768px)").matches ||
+    /Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent)
+  );
+}
+
+// Listen for connection
+window.addEventListener("message", (event) => {
+  if (event.origin !== EXPLORER_ORIGIN) return;
+
+  if (event.data?.action === "status" && event.data?.message === "Connected") {
+    receivedConnection = true;
+  }
+});
+
+// Safe watchdog (wait for iframe + adaptive timing)
+window.addEventListener("load", () => {
+  const waitForIframe = setInterval(() => {
+    if (!iframe) return;
+
+    clearInterval(waitForIframe);
+
+    const delay = isMobile() ? 3000 : 1200;
+
+    setTimeout(() => {
+      if (!receivedConnection && !failed) {
+        failed = true;
+        window.location.href = "https://cattymod.app/explore/403.html";
+      }
+    }, delay);
+  }, 50);
+});
+</script>
+
+</body>
+</html>
